@@ -24,6 +24,18 @@ class MongoStore extends MetaStore {
     }
   }
 
+  @override
+  Future<bool> healthCheck() async {
+    try {
+      await db
+          .collection(packageCollection)
+          .findOne(where.limit(1));
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
   static SelectorBuilder _selectByName(String? name) => where.eq('name', name);
 
   Future<UnpubQueryResult> _queryPackagesBySelector(
@@ -80,13 +92,24 @@ class MongoStore extends MetaStore {
   @override
   increaseDownloads(name, version) {
     var today = DateFormat('yyyyMMdd').format(DateTime.now());
-    // Fire-and-forget: don't await _ensureConnection to avoid blocking response
-    db
-        .collection(packageCollection)
-        .update(_selectByName(name), modify.inc('download', 1));
-    db
-        .collection(statsCollection)
-        .update(_selectByName(name), modify.inc('d$today', 1));
+    _ensureConnection().then((_) async {
+      try {
+        await db
+            .collection(packageCollection)
+            .update(_selectByName(name), modify.inc('download', 1));
+      } catch (e) {
+        print('Warning: failed to increment download count for $name: $e');
+      }
+      try {
+        await db
+            .collection(statsCollection)
+            .update(_selectByName(name), modify.inc('d$today', 1));
+      } catch (e) {
+        print('Warning: failed to increment stats for $name: $e');
+      }
+    }).catchError((e) {
+      print('Warning: cannot increment downloads for $name, DB unreachable: $e');
+    });
   }
 
   @override

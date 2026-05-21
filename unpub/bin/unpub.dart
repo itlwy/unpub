@@ -52,4 +52,20 @@ main(List<String> args) async {
 
   var server = await app.serve(host, port);
   print('Serving at http://${server.address.host}:${server.port}');
+
+  ProcessSignal.sigterm.watch().listen((_) async {
+    print('Received SIGTERM, shutting down gracefully...');
+    await server.close(force: true);
+    await db.close();
+    print('Shutdown complete.');
+    exit(0);
+  });
+
+  ProcessSignal.sigint.watch().listen((_) async {
+    print('Received SIGINT, shutting down gracefully...');
+    await server.close(force: true);
+    await db.close();
+    print('Shutdown complete.');
+    exit(0);
+  });
 }

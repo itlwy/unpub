@@ -81,6 +81,28 @@ class App {
         }),
       );
 
+  static shelf.Handler _errorHandler(shelf.Handler innerHandler) {
+    return (shelf.Request request) async {
+      try {
+        return await innerHandler(request);
+      } catch (error, stackTrace) {
+        print('Unhandled error in ${request.method} ${request.requestedUri}:');
+        print(error);
+        print(stackTrace);
+        return shelf.Response(
+          HttpStatus.internalServerError,
+          headers: {
+            HttpHeaders.contentTypeHeader: ContentType.json.mimeType,
+            'Access-Control-Allow-Origin': '*',
+          },
+          body: json.encode({
+            'error': {'message': 'Internal server error'}
+          }),
+        );
+      }
+    };
+  }
+
   http.Client? _googleapisClient;
 
   String _resolveUrl(shelf.Request req, String reference) {
@@ -122,6 +144,7 @@ class App {
     var handler = const shelf.Pipeline()
         .addMiddleware(corsHeaders())
         .addMiddleware(shelf.logRequests())
+        .addMiddleware(_errorHandler)
         .addHandler((req) async {
       // Return 404 by default
       // https://github.com/google/dart-neats/issues/1
@@ -533,6 +556,16 @@ class App {
     );
 
     return _okWithJson({'data': data.toJson()});
+  }
+
+  @Route.get('/healthz')
+  Future<shelf.Response> healthz(shelf.Request req) async {
+    var healthy = await metaStore.healthCheck();
+    if (healthy) {
+      return shelf.Response.ok('ok');
+    } else {
+      return shelf.Response.internalServerError(body: 'unhealthy');
+    }
   }
 
   @Route.get('/')

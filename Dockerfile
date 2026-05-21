@@ -48,4 +48,7 @@ RUN ln -s usr/local/bin/docker-entrypoint.sh /entrypoint.sh # backwards compat
 
 ENTRYPOINT ["docker-entrypoint.sh"]
 
+HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
+  CMD wget -qO- http://localhost:4000/healthz | grep -q ok || exit 1
+
 EXPOSE 4000

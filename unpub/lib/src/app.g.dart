@@ -24,6 +24,7 @@ Router _$AppRouter(App service) {
   router.add('GET', r'/packages/<name>.json', service.getPackageVersions);
   router.add(
       'GET', r'/webapi/package/<name>/<version>', service.getPackageDetail);
+  router.add('GET', r'/healthz', service.healthz);
   router.add('GET', r'/', service.indexHtml);
   router.add('GET', r'/packages', service.indexHtml);
   router.add('GET', r'/packages/<name>', service.indexHtml);
