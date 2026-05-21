@@ -1,0 +1,22 @@
+unpub_web/lib/app_component.html
+  s_dd119776eeb050::t_4121c3d455c738 10
+.gitignore
+  s_dd119776eeb050::t_33c0c47d92c5f7 14-16
+  s_dd119776eeb050::t_287a9d1fd7f156 17
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.11",
+  "base_commit_sha": "27e85ecc8b969cdfec40fa90ed13d70070a08472",
+  "prompts": {},
+  "sessions": {
+    "s_dd119776eeb050": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "aec1e718-4064-4ccd-848b-29f269785ff2",
+        "model": "deepseek-v4-pro"
+      },
+      "human_author": "weiye0205 <weiye0205@gmail.com>"
+    }
+  }
+}
