@@ -1,0 +1,35 @@
+docker-entrypoint.sh
+  s_dd119776eeb050::t_105c89086f0daf 3
+unpub/lib/src/app.dart
+  s_dd119776eeb050::t_9c080a63f350b9 240-242
+  s_dd119776eeb050::t_87952ac42e7cf1 385-395
+  s_dd119776eeb050::t_95606abc522c14 366-375
+.gitignore
+  s_dd119776eeb050::t_3bfde41185824d 9-14
+unpub/bin/unpub.dart
+  s_dd119776eeb050::t_f3649a4eec5c43 31-32
+Dockerfile
+  s_dd119776eeb050::t_f92bfa0ec2276f 28-51
+DEPLOY.md
+  s_dd119776eeb050::t_4f7471c3e1e7fc 6-44
+  s_dd119776eeb050::t_c253d5c956ac5a 335
+  s_dd119776eeb050::t_757e2b58577a8c 240-313
+  s_dd119776eeb050::t_011294d409e6af 66-71
+  s_dd119776eeb050::t_073039ab6bd4a0 128
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.11",
+  "base_commit_sha": "fd4593cdef11e227ae36cb540e505868aa417965",
+  "prompts": {},
+  "sessions": {
+    "s_dd119776eeb050": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "aec1e718-4064-4ccd-848b-29f269785ff2",
+        "model": "deepseek-v4-pro"
+      },
+      "human_author": "weiye0205 <weiye0205@gmail.com>"
+    }
+  }
+}
