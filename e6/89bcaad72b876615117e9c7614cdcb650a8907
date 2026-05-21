@@ -1,0 +1,28 @@
+unpub/lib/src/mongo_store.dart
+  s_dd119776eeb050::t_399a05b0415988 51
+  s_dd119776eeb050::t_5a26fa53cc8cd0 14-26
+  s_dd119776eeb050::t_2fc913b52ad204 42
+  s_dd119776eeb050::t_d3ef04b8328125 83
+  s_dd119776eeb050::t_1f7c2b64f02147 100-101
+  s_dd119776eeb050::t_047b51a90530b5 74
+  s_dd119776eeb050::t_c047423074ae76 66
+unpub/bin/unpub.dart
+  s_dd119776eeb050::t_1ec4e5ee12cc4e 32-43
+  s_dd119776eeb050::t_c36c0e228af769 1
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.11",
+  "base_commit_sha": "e689bcaad72b876615117e9c7614cdcb650a8907",
+  "prompts": {},
+  "sessions": {
+    "s_dd119776eeb050": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "aec1e718-4064-4ccd-848b-29f269785ff2",
+        "model": "deepseek-v4-pro"
+      },
+      "human_author": "weiye0205 <weiye0205@gmail.com>"
+    }
+  }
+}
