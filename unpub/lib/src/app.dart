@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:collection/collection.dart' show IterableExtension;
+import 'package:markdown/markdown.dart';
 import 'package:shelf/shelf.dart' as shelf;
 import 'package:shelf/shelf_io.dart' as shelf_io;
 import 'package:http/http.dart' as http;
@@ -506,6 +507,16 @@ class App {
 
     var depMap = (pubspec['dependencies'] as Map? ?? {}).cast<String, String>();
 
+    // Render markdown to HTML with GFM extensions (tables, fenced code, etc.)
+    var readmeHtml = packageVersion.readme != null
+        ? markdownToHtml(packageVersion.readme!,
+            extensionSet: ExtensionSet.gitHubFlavored)
+        : null;
+    var changelogHtml = packageVersion.changelog != null
+        ? markdownToHtml(packageVersion.changelog!,
+            extensionSet: ExtensionSet.gitHubFlavored)
+        : null;
+
     var data = WebapiDetailView(
       package.name,
       packageVersion.version,
@@ -513,8 +524,8 @@ class App {
       packageVersion.pubspec['homepage'] ?? '',
       package.uploaders ?? [],
       packageVersion.createdAt,
-      packageVersion.readme,
-      packageVersion.changelog,
+      readmeHtml,
+      changelogHtml,
       versions,
       authors,
       depMap.keys.toList(),

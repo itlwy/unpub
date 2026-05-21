@@ -1702,5 +1702,13 @@
   </head>
   <body>
     <my-app>Loading...</my-app>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <script>
+      mermaid.initialize({startOnLoad:false,theme:"default"});
+      new MutationObserver(function(ms){
+        for(var m of ms) for(var n of m.addedNodes)
+          if(n.querySelector && n.querySelector(".language-mermaid")){mermaid.run();return}
+      }).observe(document.body,{childList:true,subtree:true});
+    </script>
   </body>
 </html>
