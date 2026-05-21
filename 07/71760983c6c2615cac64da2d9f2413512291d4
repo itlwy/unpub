@@ -1,0 +1,35 @@
+unpub/lib/src/app.g.dart
+  s_dd119776eeb050::t_9c7bb2dba8e70d 27
+unpub/lib/src/mongo_store.dart
+  s_dd119776eeb050::t_2fd30c2960e0d0 27-38
+  s_dd119776eeb050::t_40737d9b0f0aee 110-112
+  s_dd119776eeb050::t_bbee167d826c94 95-109
+Dockerfile
+  s_dd119776eeb050::t_539929b5b8a8e5 51-53
+docker-entrypoint.sh
+  s_dd119776eeb050::t_1741129df11c01 4-29,31
+unpub/lib/src/meta_store.dart
+  s_dd119776eeb050::t_f5e307f82563c2 22-23
+unpub/bin/unpub.dart
+  s_dd119776eeb050::t_18487476ce5db6 55-70
+unpub/lib/src/app.dart
+  s_dd119776eeb050::t_670050c4f81c80 84-105
+  s_dd119776eeb050::t_6a7c082197d105 147
+  s_dd119776eeb050::t_6ced8d93b59c03 561-570
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.11",
+  "base_commit_sha": "0771760983c6c2615cac64da2d9f2413512291d4",
+  "prompts": {},
+  "sessions": {
+    "s_dd119776eeb050": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "aec1e718-4064-4ccd-848b-29f269785ff2",
+        "model": "deepseek-v4-pro"
+      },
+      "human_author": "weiye0205 <weiye0205@gmail.com>"
+    }
+  }
+}
