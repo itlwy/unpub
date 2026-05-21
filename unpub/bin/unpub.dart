@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:path/path.dart' as path;
 import 'package:args/args.dart';
@@ -27,6 +28,18 @@ main(List<String> args) async {
 
   final db = Db(dbUri);
   await db.open();
+
+  // Keep MongoDB connection alive with periodic ping
+  Timer.periodic(Duration(minutes: 5), (_) async {
+    try {
+      await db.collection('packages').findOne(where.limit(1));
+    } catch (_) {
+      try {
+        await db.close();
+      } catch (_) {}
+      await db.open();
+    }
+  });
 
   var baseDir = path.absolute(
       Platform.environment['UNPUB_PACKAGE_DIR'] ?? 'unpub-packages');

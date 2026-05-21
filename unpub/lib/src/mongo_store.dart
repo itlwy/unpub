@@ -11,6 +11,19 @@ class MongoStore extends MetaStore {
 
   MongoStore(this.db);
 
+  Future<void> _ensureConnection() async {
+    try {
+      await db
+          .collection(packageCollection)
+          .findOne(where.limit(1));
+    } catch (_) {
+      try {
+        await db.close();
+      } catch (_) {}
+      await db.open();
+    }
+  }
+
   static SelectorBuilder _selectByName(String? name) => where.eq('name', name);
 
   Future<UnpubQueryResult> _queryPackagesBySelector(
@@ -26,6 +39,7 @@ class MongoStore extends MetaStore {
 
   @override
   queryPackage(name) async {
+    await _ensureConnection();
     var json =
         await db.collection(packageCollection).findOne(_selectByName(name));
     if (json == null) return null;
@@ -34,6 +48,7 @@ class MongoStore extends MetaStore {
 
   @override
   addVersion(name, version) async {
+    await _ensureConnection();
     await db.collection(packageCollection).update(
         _selectByName(name),
         modify
@@ -48,6 +63,7 @@ class MongoStore extends MetaStore {
 
   @override
   addUploader(name, email) async {
+    await _ensureConnection();
     await db
         .collection(packageCollection)
         .update(_selectByName(name), modify.push('uploaders', email));
@@ -55,6 +71,7 @@ class MongoStore extends MetaStore {
 
   @override
   removeUploader(name, email) async {
+    await _ensureConnection();
     await db
         .collection(packageCollection)
         .update(_selectByName(name), modify.pull('uploaders', email));
@@ -63,6 +80,7 @@ class MongoStore extends MetaStore {
   @override
   increaseDownloads(name, version) {
     var today = DateFormat('yyyyMMdd').format(DateTime.now());
+    // Fire-and-forget: don't await _ensureConnection to avoid blocking response
     db
         .collection(packageCollection)
         .update(_selectByName(name), modify.inc('download', 1));
@@ -79,7 +97,8 @@ class MongoStore extends MetaStore {
     keyword,
     uploader,
     dependency,
-  }) {
+  }) async {
+    await _ensureConnection();
     var selector =
         where.sortBy(sort, descending: true).limit(size).skip(page * size);
 
