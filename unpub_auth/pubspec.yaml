@@ -1,7 +1,7 @@
 name: unpub_auth
 description: An auth tool for unpub.
 version: 0.1.0+3
-homepage: https://github.com/bytedance/unpub
+homepage: https://github.com/itlwy/unpub
 
 environment:
   sdk: '>=2.15.0 <3.0.0'

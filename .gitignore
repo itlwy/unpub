@@ -11,5 +11,9 @@
 # IDE
 .idea/
 
+# FVM version manager
+.fvm/
+.fvmrc
+
 # Docker runtime data
 data/

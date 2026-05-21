@@ -6,7 +6,7 @@ Unpub is a self-hosted private Dart Pub server for Enterprise, with a simple web
 
 ## Screenshots
 
-![Screenshot](https://raw.githubusercontent.com/bytedance/unpub/master/assets/screenshot.png)
+![Screenshot](https://raw.githubusercontent.com/itlwy/unpub/master/assets/screenshot.png)
 
 ## Usage
 
@@ -118,7 +118,7 @@ var app = unpub.App(
 
 #### Available Package Stores
 
-1. [unpub_aws](https://github.com/bytedance/unpub/tree/master/unpub_aws): AWS S3 package store, maintained by [@CleanCode](https://github.com/Clean-Cole).
+1. [unpub_aws](https://github.com/itlwy/unpub/tree/master/unpub_aws): AWS S3 package store, maintained by [@CleanCode](https://github.com/Clean-Cole).
 
 ## Badges
 

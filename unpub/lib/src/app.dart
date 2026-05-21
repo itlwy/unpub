@@ -43,7 +43,7 @@ class App {
 
   /// validate if the package can be published
   ///
-  /// for more details, see: https://github.com/bytedance/unpub#package-validator
+  /// for more details, see: https://github.com/itlwy/unpub#package-validator
   final Future<void> Function(
       Map<String, dynamic> pubspec, String uploaderEmail)? uploadValidator;
 
