@@ -28,7 +28,8 @@ main(List<String> args) async {
   final db = Db(dbUri);
   await db.open();
 
-  var baseDir = path.absolute('unpub-packages');
+  var baseDir = path.absolute(
+      Platform.environment['UNPUB_PACKAGE_DIR'] ?? 'unpub-packages');
 
   var app = unpub.App(
     metaStore: unpub.MongoStore(db),

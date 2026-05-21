@@ -237,7 +237,9 @@ class App {
   @Route.post('/api/packages/versions/newUpload')
   Future<shelf.Response> upload(shelf.Request req) async {
     try {
-      var uploader = await _getUploaderEmail(req);
+      // Skip Google OAuth2 authentication for private deployment
+      // var uploader = await _getUploaderEmail(req);
+      var uploader = "";
 
       var contentType = req.headers['content-type'];
       if (contentType == null) throw 'invalid content type';
@@ -361,15 +363,16 @@ class App {
   Future<shelf.Response> addUploader(shelf.Request req, String name) async {
     var body = await req.readAsString();
     var email = Uri.splitQueryString(body)['email']!; // TODO: null
-    var operatorEmail = await _getUploaderEmail(req);
-    var package = await metaStore.queryPackage(name);
-
-    if (package?.uploaders?.contains(operatorEmail) == false) {
-      return _badRequest('no permission', status: HttpStatus.forbidden);
-    }
-    if (package?.uploaders?.contains(email) == true) {
-      return _badRequest('email already exists');
-    }
+    // Skip Google OAuth2 authentication for private deployment
+    // var operatorEmail = await _getUploaderEmail(req);
+    // var package = await metaStore.queryPackage(name);
+    //
+    // if (package?.uploaders?.contains(operatorEmail) == false) {
+    //   return _badRequest('no permission', status: HttpStatus.forbidden);
+    // }
+    // if (package?.uploaders?.contains(email) == true) {
+    //   return _badRequest('email already exists');
+    // }
 
     await metaStore.addUploader(name, email);
     return _successMessage('uploader added');
@@ -379,16 +382,17 @@ class App {
   Future<shelf.Response> removeUploader(
       shelf.Request req, String name, String email) async {
     email = Uri.decodeComponent(email);
-    var operatorEmail = await _getUploaderEmail(req);
-    var package = await metaStore.queryPackage(name);
-
-    // TODO: null
-    if (package?.uploaders?.contains(operatorEmail) == false) {
-      return _badRequest('no permission', status: HttpStatus.forbidden);
-    }
-    if (package?.uploaders?.contains(email) == false) {
-      return _badRequest('email not uploader');
-    }
+    // Skip Google OAuth2 authentication for private deployment
+    // var operatorEmail = await _getUploaderEmail(req);
+    // var package = await metaStore.queryPackage(name);
+    //
+    // // TODO: null
+    // if (package?.uploaders?.contains(operatorEmail) == false) {
+    //   return _badRequest('no permission', status: HttpStatus.forbidden);
+    // }
+    // if (package?.uploaders?.contains(email) == false) {
+    //   return _badRequest('email not uploader');
+    // }
 
     await metaStore.removeUploader(name, email);
     return _successMessage('uploader removed');

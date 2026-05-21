@@ -7,3 +7,9 @@
 
 # pubspec.lock
 */pubspec.lock
+
+# IDE
+.idea/
+
+# Docker runtime data
+data/
