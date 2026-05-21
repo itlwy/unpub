@@ -154,6 +154,28 @@ docker logs unpub      # 查看日志
 docker logs -f unpub   # 实时跟踪日志
 ```
 
+### 健康检查
+
+```bash
+# 快速检查服务是否正常
+curl http://localhost:4000/healthz
+# 返回 "ok" = 正常，"unhealthy" = 数据库不可达
+
+# 查看 Docker 健康状态
+docker inspect unpub --format '{{.State.Health.Status}}'
+
+# 查看健康检查历史
+docker inspect unpub | jq '.[0].State.Health'
+
+# 查看 mongod 是否存活
+docker exec unpub mongosh --quiet --eval "db.adminCommand('ping')"
+
+# 手动触发 mongod 重启（测试看门狗）
+docker exec unpub pkill -9 mongod
+# 5秒内看门狗会自动重启 mongod，日志会显示 "mongod died, restarting..."
+docker logs unpub | tail -5
+```
+
 ### colima 管理（仅 macOS）
 
 ```bash
@@ -232,7 +254,74 @@ MongoDB 5.0 是最后一个完整支持 OP_QUERY 协议的版本，与 `mongo_da
 
 ---
 
-## 六、开发构建流程
+## 六、自动恢复机制
+
+系统内置 7 层自动恢复，无需人工介入：
+
+### 恢复链路
+
+```
+mongod 崩溃 → 看门狗 5s 内自动重启 → 应用自动重连 → 服务恢复
+接口异常   → 错误中间件捕获   → 返回 500 JSON → 进程不崩
+Dart 僵死  → /healthz 连续失败 → Docker 90s 后重启容器
+docker stop → SIGTERM 优雅关闭 → 清理 DB 连接后干净退出
+```
+
+### 逐层说明
+
+| 层 | 机制 | 位置 | 说明 |
+|---|------|------|------|
+| 进程内 | 错误中间件 | `app.dart` | 所有路由异常被捕获，返回 500 JSON，进程不崩溃 |
+| 进程内 | DB 操作重连 | `mongo_store.dart` | 每次 DB 操作前 ping 检测，断开则自动 `close()` + `open()` 重连 |
+| 进程内 | DB 心跳 | `bin/unpub.dart` | 每 5 分钟 ping 一次 MongoDB，防止空闲超时断开 |
+| 进程内 | 下载统计容错 | `mongo_store.dart` | 下载计数写入失败会打印警告日志，不阻塞响应 |
+| 进程内 | 优雅关闭 | `bin/unpub.dart` | 收到 SIGTERM/SIGINT 后关闭 HTTP 服务 + DB 连接再退出 |
+| 进程内 | 健康检查 | `app.dart` | `/healthz` 端点，验证 MongoDB 是否可达 |
+| 容器内 | 启动就绪等待 | `docker-entrypoint.sh` | 等待 mongod 接受连接后再启动 Dart 应用，避免冷启动崩溃 |
+| 容器内 | mongod 看门狗 | `docker-entrypoint.sh` | 每 5 秒检查 mongod 进程，崩溃后自动重启 |
+| Docker | HEALTHCHECK | `Dockerfile` | 每 30s 访问 `/healthz`，连续 3 次失败自动重启容器 |
+
+### 日志关键字
+
+部署后如果出现异常，可通过以下关键字在日志中定位：
+
+```bash
+# 看门狗检测到 mongod 崩溃并重启
+docker logs unpub | grep "mongod died"
+
+# DB 操作前重连（说明之前连接断了）
+docker logs unpub | grep "cannot increment downloads"
+
+# 路由异常被中间件捕获
+docker logs unpub | grep "Unhandled error"
+
+# 优雅关闭
+docker logs unpub | grep "shutting down gracefully"
+```
+
+### 验证自恢复功能
+
+```bash
+# 1. 验证 health 端点
+curl http://localhost:4000/healthz     # 应返回 "ok"
+
+# 2. 模拟 mongod 崩溃（看门狗测试）
+docker exec unpub pkill -9 mongod
+sleep 6
+docker exec unpub mongosh --quiet --eval "db.adminCommand('ping')"
+# 看门狗已自动重启 mongod，应返回 {"ok":1}
+
+# 3. curl 再次验证服务正常
+curl http://localhost:4000/healthz     # 应返回 "ok"
+
+# 4. 查看 Docker 健康状态
+docker inspect unpub --format '{{.State.Health.Status}}'
+# 应返回 "healthy"
+```
+
+---
+
+## 七、开发构建流程
 
 ### 项目结构关系
 
@@ -335,7 +424,8 @@ docker logs unpub | tail -5
 | unpub 源码 | 通过 `COPY ./unpub /src/unpub` 直接从仓库复制 |
 | 端口 | 4000（pub API + Web 管理界面） |
 | 数据目录 | `/data/db`（MongoDB 数据，挂载到宿主机） |
-| 入口脚本 | 先启动 mongod → 执行 dart pub get → 启动 unpub |
+| 入口脚本 | 启动就绪等待 → mongod + 看门狗 → dart pub get → 启动 unpub |
+| 健康检查 | `HEALTHCHECK` 每 30s 检测 `/healthz`，3 次失败自动重启容器 |
 
 ---
 
