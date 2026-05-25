@@ -1,0 +1,19 @@
+LINUX_DEPLOY.md
+  s_76aff4e981bf45::t_b526ba2c735279 1-295
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.0",
+  "base_commit_sha": "a9d4bc6ce35fdd5e1814a2b551076e1b1b4ec9da",
+  "prompts": {},
+  "sessions": {
+    "s_76aff4e981bf45": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "3de1b36f-8555-4cf3-a4bd-5f9a8d11d6d8",
+        "model": "deepseek-v4-pro"
+      },
+      "human_author": "weiye0205 <weiye0205@gmail.com>"
+    }
+  }
+}
