@@ -10,6 +10,20 @@
 ## 环境要求
 
 - Linux（x86_64），Docker >= 1.12 已安装并开机自启
+- 操作用户需有 `docker` 权限（在 `docker` 组 或 `root`）
+
+### 权限检查
+
+```bash
+# 确认当前用户能执行 docker
+docker ps
+
+# 如果报 "permission denied"，将用户加入 docker 组：
+sudo usermod -aG docker $USER
+# 重新登录后生效
+```
+
+> 以下所有命令如提示权限不足，前面加 `sudo`。
 
 ## 部署步骤
 
