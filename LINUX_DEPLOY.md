@@ -10,20 +10,19 @@
 ## 环境要求
 
 - Linux（x86_64），Docker >= 1.12 已安装并开机自启
-- 操作用户需有 `docker` 权限（在 `docker` 组 或 `root`）
+- 操作用户在 `docker` 组（避免用 root）
 
-### 权限检查
+### 一次性准备（如未就绪）
 
 ```bash
-# 确认当前用户能执行 docker
-docker ps
-
-# 如果报 "permission denied"，将用户加入 docker 组：
+# 1. 当前用户加入 docker 组
 sudo usermod -aG docker $USER
-# 重新登录后生效
-```
+# 退出重新登录生效
 
-> 以下所有命令如提示权限不足，前面加 `sudo`。
+# 2. 创建数据目录
+sudo mkdir -p /data/unpub
+sudo chown $USER:$USER /data/unpub
+```
 
 ## 部署步骤
 
