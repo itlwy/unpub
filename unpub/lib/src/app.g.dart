@@ -17,6 +17,8 @@ Router _$AppRouter(App service) {
   router.add('POST', r'/api/packages/versions/newUpload', service.upload);
   router.add(
       'GET', r'/api/packages/versions/newUploadFinish', service.uploadFinish);
+  router.add('DELETE', r'/api/packages/<name>/versions/prereleases',
+      service.removePrereleases);
   router.add('POST', r'/api/packages/<name>/uploaders', service.addUploader);
   router.add('DELETE', r'/api/packages/<name>/uploaders/<email>',
       service.removeUploader);

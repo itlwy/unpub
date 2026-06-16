@@ -42,16 +42,44 @@ Future<http.Response> getSpecificVersion(String package, String version) {
   return http.get(baseUri.resolve('/api/packages/$package/versions/$version'));
 }
 
+Future<http.Response> downloadVersion(String package, String version) {
+  package = Uri.encodeComponent(package);
+  version = Uri.encodeComponent(version);
+  return http.get(
+    baseUri.resolve('/packages/$package/versions/$version.tar.gz'),
+  );
+}
+
+Future<http.Response> removePrereleases(
+  String package,
+  String base, {
+  String tag = 'beta',
+  bool dryRun = false,
+}) {
+  package = Uri.encodeComponent(package);
+  var uri = baseUri.replace(
+    path: '/api/packages/$package/versions/prereleases',
+    queryParameters: {'base': base, 'tag': tag, if (dryRun) 'dryRun': 'true'},
+  );
+  return http.delete(uri);
+}
+
 Future<ProcessResult> pubPublish(String name, String version) {
-  return Process.run('dart', ['pub', 'publish', '--force'],
-      workingDirectory: path.absolute('test/fixtures', name, version),
-      environment: {'PUB_HOSTED_URL': pubHostedUrl});
+  return Process.run(
+    'dart',
+    ['pub', 'publish', '--force'],
+    workingDirectory: path.absolute('test/fixtures', name, version),
+    environment: {'PUB_HOSTED_URL': pubHostedUrl},
+  );
 }
 
 Future<ProcessResult> pubUploader(String name, String operation, String email) {
   assert(['add', 'remove'].contains(operation), 'operation error');
 
-  return Process.run('dart', ['pub', 'uploader', operation, email],
-      workingDirectory: path.absolute('test/fixtures', name, '0.0.1'),
-      environment: {'PUB_HOSTED_URL': pubHostedUrl});
+  return Process.run(
+    'dart',
+    ['pub', 'uploader', operation, email],
+    workingDirectory: path.absolute('test/fixtures', name, '0.0.1'),
+    environment: {'PUB_HOSTED_URL': pubHostedUrl},
+  );
 }

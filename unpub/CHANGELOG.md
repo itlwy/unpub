@@ -1,3 +1,9 @@
+## 2.0.1
+
+- Prefer stable versions when calculating latest package metadata.
+- Add prerelease cleanup API for removing beta versions after the stable release is published.
+- Add file and S3 package tarball deletion support for prerelease cleanup.
+
 ## 2.0.0
 
 - Supports NNBD

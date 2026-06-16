@@ -12,4 +12,8 @@ abstract class PackageStore {
   }
 
   Future<void> upload(String name, String version, List<int> content);
+
+  Future<void> delete(String name, String version) {
+    throw 'delete not implemented';
+  }
 }

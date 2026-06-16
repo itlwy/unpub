@@ -17,13 +17,15 @@ class S3Store extends PackageStore {
   Minio? minio;
   Map<String, String>? environment;
 
-  S3Store(this.bucketName,
-      {this.region,
-        this.getObjectPath,
-        this.endpoint,
-        this.credentials,
-        this.minio, this.environment}) {
-
+  S3Store(
+    this.bucketName, {
+    this.region,
+    this.getObjectPath,
+    this.endpoint,
+    this.credentials,
+    this.minio,
+    this.environment,
+  }) {
     final env = environment ?? Platform.environment;
 
     // Check for env vars or container credentials if none were provided.
@@ -52,11 +54,18 @@ class S3Store extends PackageStore {
   @override
   Future<void> upload(String name, String version, List<int> content) async {
     await minio!.putObject(
-        bucketName, _getObjectKey(name, version), Stream.value(content));
+      bucketName,
+      _getObjectKey(name, version),
+      Stream.value(content),
+    );
   }
 
   @override
   Stream<List<int>> download(String name, String version) {
     return waitFor(minio!.getObject(bucketName, _getObjectKey(name, version)));
+  }
+
+  Future<void> delete(String name, String version) async {
+    await minio!.removeObject(bucketName, _getObjectKey(name, version));
   }
 }

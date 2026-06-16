@@ -127,6 +127,44 @@ curl http://localhost:4000/api/packages/test_pkg
 
 > **不需要** `ax_publish` 或 Google OAuth token。`dart pub publish --server=<URL>` 对非 pub.dev 的第三方服务器不会触发 Google 鉴权。
 
+### 测试版本发布与清理
+
+测试期间可以按语义化版本发布预发布包，例如 `1.0.1-beta.1`、`1.0.1-beta.2`：
+
+```bash
+# pubspec.yaml
+version: 1.0.1-beta.1
+
+dart pub publish --server=http://localhost:4000 --force
+```
+
+正式发布时把版本改成稳定版：
+
+```bash
+# pubspec.yaml
+version: 1.0.1
+
+dart pub publish --server=http://localhost:4000 --force
+```
+
+服务端会优先把最高稳定版作为 `latest`。也就是说，存在 `1.0.0`、`1.0.1-beta.1`、`1.0.1-beta.2` 时，`latest` 仍是 `1.0.0`；正式发布 `1.0.1` 后，`latest` 才变成 `1.0.1`。
+
+正式版发布完成后，可以清理同 base version 的 beta 版本：
+
+```bash
+# 先 dry run，确认会删除哪些版本
+curl -X DELETE \
+  'http://localhost:4000/api/packages/<包名>/versions/prereleases?base=1.0.1&tag=beta&dryRun=true'
+
+# 确认无误后执行清理
+curl -X DELETE \
+  'http://localhost:4000/api/packages/<包名>/versions/prereleases?base=1.0.1&tag=beta'
+```
+
+清理规则只匹配同一个正式版本和同一个预发布标签。例如 `base=1.0.1&tag=beta` 只会清理 `1.0.1-beta.*`，不会清理 `1.0.2-beta.1`、`1.0.1-rc.1` 或 `1.0.1`。
+
+清理接口是幂等的。重复执行时，如果已经没有可清理版本，会返回空的 `removed` 列表。清理后，已删除 beta 的版本 API 和 tarball 下载都会返回 404。
+
 ### 常用 API 测试
 
 ```bash
@@ -227,26 +265,16 @@ uname -m
 # x86_64 → Intel Mac
 ```
 
-### 修改 Dockerfile 中的 Dart SDK URL
-
-Dockerfile 第 29-31 行，根据目标部署机器架构选择：
-
-```dockerfile
-# Apple Silicon (ARM64) — 默认
-ENV DART_SDK_ZIP_URL https://storage.flutter-io.cn/dart-archive/channels/stable/release/2.17.1/sdk/dartsdk-linux-arm64-release.zip
-
-# Intel / x86_64 服务器
-# ENV DART_SDK_ZIP_URL https://storage.flutter-io.cn/dart-archive/channels/stable/release/2.17.1/sdk/dartsdk-linux-x64-release.zip
-```
-
 ### 构建
 
 ```bash
 cd unpub
-docker build -t unpub:1.0.1 .
+docker build -t unpub:2.0.1 .
 ```
 
-> **注意**: 基础镜像 `mongo:5.0` 也是多架构的，Docker 会自动拉取匹配当前平台的版本。如果在 ARM64 Mac 上构建 x86_64 镜像供 Intel 服务器使用，需要加 `--platform linux/amd64`。
+Dockerfile 会根据 Docker 目标平台自动选择 Dart SDK 架构：`linux/amd64` 使用 `dartsdk-linux-x64-release.zip`，`linux/arm64` 使用 `dartsdk-linux-arm64-release.zip`。如果需要显式指定，也可以加 `--build-arg DART_SDK_ARCH=x64` 或 `--build-arg DART_SDK_ARCH=arm64`。
+
+> **注意**: 基础镜像 `mongo:5.0` 也是多架构的，Docker 会自动拉取匹配当前平台的版本。如果在 ARM64 Mac 上构建 x86_64 镜像供 Intel 服务器使用，需要使用 `docker buildx build --platform linux/amd64`。
 
 ## 2.2 启动容器
 
@@ -259,7 +287,7 @@ docker run -d --name unpub \
   -p 4000:4000 \
   -v $(pwd)/data/datadb:/data/db \
   --restart always \
-  unpub:1.0.1
+  unpub:2.0.1
 
 # 查看日志确认启动成功
 docker logs unpub
@@ -304,6 +332,23 @@ name: my_package
 publish_to: http://<打包机IP或域名>:4000
 ```
 
+### 清理正式版对应的 beta 包
+
+```bash
+# dry run
+curl -X DELETE \
+  'http://<打包机IP或域名>:4000/api/packages/<包名>/versions/prereleases?base=1.0.1&tag=beta&dryRun=true'
+
+# 执行清理
+curl -X DELETE \
+  'http://<打包机IP或域名>:4000/api/packages/<包名>/versions/prereleases?base=1.0.1&tag=beta'
+
+# 验证 beta 已不可见，正式版仍可下载
+curl -i http://<打包机IP或域名>:4000/api/packages/<包名>/versions/1.0.1-beta.1
+curl -i http://<打包机IP或域名>:4000/packages/<包名>/versions/1.0.1-beta.1.tar.gz
+curl -I http://<打包机IP或域名>:4000/packages/<包名>/versions/1.0.1.tar.gz
+```
+
 ## 2.5 部署到远程打包机（SSH + scp）
 
 如果另一台 Mac 打包机没有 Docker Registry，可以通过 scp 直接分发镜像。
@@ -321,23 +366,27 @@ colima start -f
 
 ```bash
 # 构建镜像（确认架构匹配远程机，参考 2.1 节）
-docker build -t unpub:1.0.1 .
+docker build -t unpub:2.0.1 .
+
+# 如需在 ARM64 Mac 上构建 x86_64 服务器镜像
+docker buildx build --platform linux/amd64 --load -t unpub:2.0.1-linux .
 
 # 导出为压缩包
-docker save unpub:1.0.1 | gzip > unpub-1.0.1.tar.gz
+docker save unpub:2.0.1 | gzip > unpub-2.0.1.tar.gz
+docker save unpub:2.0.1-linux | gzip > unpub-2.0.1-linux.tar.gz
 ```
 
 ### 拷贝到远程机并启动
 
 ```bash
 # scp 拷贝
-scp unpub-1.0.1.tar.gz user@<打包机IP>:~/
+scp unpub-2.0.1.tar.gz user@<打包机IP>:~/
 
 # SSH 到远程机
 ssh user@<打包机IP>
 
 # 加载镜像
-docker load < unpub-1.0.1.tar.gz
+docker load < unpub-2.0.1.tar.gz
 
 # 启动（数据目录按需调整）
 mkdir -p ~/unpub-data
@@ -345,13 +394,13 @@ docker run -d --name unpub \
   -p 4000:4000 \
   -v ~/unpub-data/datadb:/data/db \
   --restart always \
-  unpub:1.0.1
+  unpub:2.0.1
 
 # 验证
 curl http://localhost:4000/healthz
 ```
 
-> **架构注意**：`uname -m` 确认远程机架构。ARM64 Mac 用 `dartsdk-linux-arm64-release.zip`（默认），Intel Mac 需先改 Dockerfile 为 `dartsdk-linux-x64-release.zip` 再构建。或者在 ARM64 本机用 `docker build --platform linux/amd64` 交叉编译。
+> **架构注意**：`uname -m` 确认远程机架构。ARM64 Mac 本机镜像直接 `docker build`；x86_64 服务器镜像用 `docker buildx build --platform linux/amd64 --load` 构建，Dockerfile 会自动选择 x64 Dart SDK。
 
 ### 后续更新
 
@@ -464,14 +513,14 @@ docker logs unpub --tail 100  # 最近 100 行
 
 ```bash
 # 一键重建
-docker build -t unpub:1.0.1 . && \
+docker build -t unpub:2.0.1 . && \
 docker stop unpub && \
 docker rm unpub && \
 docker run -d --name unpub \
   -p 4000:4000 \
   -v $(pwd)/data/datadb:/data/db \
   --restart always \
-  unpub:1.0.1 && \
+  unpub:2.0.1 && \
 docker logs unpub | tail -10
 ```
 
@@ -490,7 +539,7 @@ docker run -d --name unpub \
   -p 4000:4000 \
   -v $(pwd)/data/datadb:/data/db \
   --restart always \
-  unpub:1.0.1
+  unpub:2.0.1
 ```
 
 ## 3.4 开机自启（Mac 打包机）
@@ -613,3 +662,4 @@ colima delete          # 完全清除（会丢失所有容器和数据）
 | Dockerfile 钉 MongoDB 5.0 | `Dockerfile` | `mongo_dart 0.7.x` 不兼容 MongoDB 6.0+ |
 | GFM Markdown 渲染 | `unpub/lib/src/app.dart` | README/CHANGELOG 使用 GitHub Flavored Markdown 渲染 |
 | 自恢复机制 | `docker-entrypoint.sh`, `app.dart` 等 | 多层自动恢复，详见 3.5 节 |
+| 测试版本清理 | `unpub/lib/src/app.dart`, `mongo_store.dart`, `file_store.dart` | 支持正式版发布后清理同 base version 的 `beta` 版本 |

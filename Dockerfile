@@ -24,21 +24,29 @@ RUN sed -i s@/archive.ubuntu.com/@/mirrors.aliyun.com/@g /etc/apt/sources.list &
     apt-get install unzip wget -y
 
 ### setup dart sdk ###
-ENV DART_HOME /opt/dart-sdk
+ENV DART_HOME=/opt/dart-sdk
 
-# x86_64 服务器部署时改为: dartsdk-linux-x64-release.zip
-# Apple Silicon 本地测试: dartsdk-linux-arm64-release.zip
-ENV DART_SDK_ZIP_URL https://storage.flutter-io.cn/dart-archive/channels/stable/release/2.17.1/sdk/dartsdk-linux-arm64-release.zip
+ARG TARGETARCH
+ARG DART_VERSION=2.17.1
+ARG DART_SDK_ARCH
 
-RUN mkdir -p $DART_HOME && \
-    wget -O /tmp/dart-sdk.zip -t 5 "${DART_SDK_ZIP_URL}" && \
+RUN set -eux; \
+    target_arch="${DART_SDK_ARCH:-${TARGETARCH:-$(dpkg --print-architecture)}}"; \
+    case "${target_arch}" in \
+      amd64|x86_64|x64) dart_sdk_arch="x64" ;; \
+      arm64|aarch64) dart_sdk_arch="arm64" ;; \
+      *) echo "Unsupported Dart SDK architecture: ${target_arch}. Use --build-arg DART_SDK_ARCH=x64 or arm64."; exit 1 ;; \
+    esac; \
+    dart_sdk_zip_url="https://storage.flutter-io.cn/dart-archive/channels/stable/release/${DART_VERSION}/sdk/dartsdk-linux-${dart_sdk_arch}-release.zip"; \
+    mkdir -p $DART_HOME && \
+    wget -O /tmp/dart-sdk.zip -t 5 "${dart_sdk_zip_url}" && \
     unzip -q /tmp/dart-sdk.zip -d /opt &&\
     rm /tmp/dart-sdk.zip
 
 ### setup unpub from source ###
 COPY ./unpub /src/unpub
 
-ENV PATH ${PATH}:${DART_HOME}/bin:/.pub-cache/bin
+ENV PATH=${PATH}:${DART_HOME}/bin:/.pub-cache/bin
 
 RUN dart --version
 

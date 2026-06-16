@@ -13,9 +13,7 @@ class MongoStore extends MetaStore {
 
   Future<void> _ensureConnection() async {
     try {
-      await db
-          .collection(packageCollection)
-          .findOne(where.limit(1));
+      await db.collection(packageCollection).findOne(where.limit(1));
     } catch (_) {
       try {
         await db.close();
@@ -27,9 +25,7 @@ class MongoStore extends MetaStore {
   @override
   Future<bool> healthCheck() async {
     try {
-      await db
-          .collection(packageCollection)
-          .findOne(where.limit(1));
+      await db.collection(packageCollection).findOne(where.limit(1));
       return true;
     } catch (_) {
       return false;
@@ -39,7 +35,8 @@ class MongoStore extends MetaStore {
   static SelectorBuilder _selectByName(String? name) => where.eq('name', name);
 
   Future<UnpubQueryResult> _queryPackagesBySelector(
-      SelectorBuilder selector) async {
+    SelectorBuilder selector,
+  ) async {
     final count = await db.collection(packageCollection).count(selector);
     final packages = await db
         .collection(packageCollection)
@@ -62,15 +59,39 @@ class MongoStore extends MetaStore {
   addVersion(name, version) async {
     await _ensureConnection();
     await db.collection(packageCollection).update(
-        _selectByName(name),
-        modify
-            .push('versions', version.toJson())
-            .addToSet('uploaders', version.uploader)
-            .setOnInsert('createdAt', version.createdAt)
-            .setOnInsert('private', true)
-            .setOnInsert('download', 0)
-            .set('updatedAt', version.createdAt),
-        upsert: true);
+          _selectByName(name),
+          modify
+              .push('versions', version.toJson())
+              .addToSet('uploaders', version.uploader)
+              .setOnInsert('createdAt', version.createdAt)
+              .setOnInsert('private', true)
+              .setOnInsert('download', 0)
+              .set('updatedAt', version.createdAt),
+          upsert: true,
+        );
+  }
+
+  @override
+  Future<List<UnpubVersion>> removeVersions(name, versions) async {
+    await _ensureConnection();
+    if (versions.isEmpty) return [];
+
+    final package = await queryPackage(name);
+    if (package == null) return [];
+
+    final versionSet = versions.toSet();
+    final removed = package.versions
+        .where((version) => versionSet.contains(version.version))
+        .toList();
+    if (removed.isEmpty) return [];
+
+    await db.collection(packageCollection).update(
+          _selectByName(name),
+          modify.pull('versions', {
+            'version': {r'$in': versions},
+          }).set('updatedAt', DateTime.now()),
+        );
+    return removed;
   }
 
   @override
@@ -108,7 +129,9 @@ class MongoStore extends MetaStore {
         print('Warning: failed to increment stats for $name: $e');
       }
     }).catchError((e) {
-      print('Warning: cannot increment downloads for $name, DB unreachable: $e');
+      print(
+        'Warning: cannot increment downloads for $name, DB unreachable: $e',
+      );
     });
   }
 
@@ -135,9 +158,9 @@ class MongoStore extends MetaStore {
       selector = selector.raw({
         'versions': {
           r'$elemMatch': {
-            'pubspec.dependencies.$dependency': {r'$exists': true}
-          }
-        }
+            'pubspec.dependencies.$dependency': {r'$exists': true},
+          },
+        },
       });
     }
 
