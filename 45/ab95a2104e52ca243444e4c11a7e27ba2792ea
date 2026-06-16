@@ -1,0 +1,110 @@
+unpub/test/fixtures/package_0/1.0.1-beta.1/README.md
+  s_b24d3b345227bd::t_0160f54c1853ad 1
+unpub/test/fixtures/package_0/1.0.1/pubspec.yaml
+  s_b24d3b345227bd::t_938f80dbe68ec7 1-6
+unpub/lib/src/package_store.dart
+  s_b24d3b345227bd::t_caddd0e4bb892d 15
+  s_b24d3b345227bd::t_e9f57879b0841d 16-18
+unpub/test/fixtures/package_0/1.0.1-beta.2/README.md
+  s_b24d3b345227bd::t_0160f54c1853ad 1
+unpub/test/fixtures/package_0/1.0.1-beta.1/CHANGELOG.md
+  s_b24d3b345227bd::t_0160f54c1853ad 1
+unpub/test/fixtures/package_0/1.0.1/CHANGELOG.md
+  s_b24d3b345227bd::t_0160f54c1853ad 1
+unpub/test/unpub_test.dart
+  s_b24d3b345227bd::t_37d3079b5b1001 30-33,84-86,137-139,171-173,180-182,188-192,233-235,263-267,269-273,275-282,317-319,335-337,457-459,461-464,471-473,475-478,482-484,492-494,496-499,503-505
+  s_b24d3b345227bd::t_b151726a1b8949 213-232,236-262,268,274,283-294
+unpub/lib/src/version_utils.dart
+  s_b24d3b345227bd::t_37d3079b5b1001 39-42
+  s_b24d3b345227bd::t_4b5c065c66493e 6-13
+  s_b24d3b345227bd::t_d4995c3b948bc0 1-5,14-25,27,36-38,43-49
+  s_b24d3b345227bd::t_e3abbfc066f977 26,28-35
+unpub/lib/src/app.dart
+  s_b24d3b345227bd::t_2ae45762f7c913 592,625
+  s_b24d3b345227bd::t_771b2dc1491f49 51,73,79,84,136-138,200-201
+  s_b24d3b345227bd::t_f368068f964445 438-439
+  s_b24d3b345227bd::t_4b182ba37d4c34 19,198,202,206,611,739
+  s_b24d3b345227bd::t_466d0cd42256db 261-262
+  s_b24d3b345227bd::t_7406e3d6dae613 574,759-768
+  s_b24d3b345227bd::t_37d3079b5b1001 49-50,68,76-78,103,133-135,139,145-147,171-174,194-195,213-216,226-230,233-235,245-248,251-260,271-272,284,315-317,369-371,402-404,406-408,423-425,451-453,462-463,522-525,582-584,595,600-603,613-615,631-633,646-649,652-655,691-694,699-702,705-710,713-722,727-730,744-745,747-754
+  s_b24d3b345227bd::t_effc9686c235e7 421-422,426-437,440-450,454-461,464-500
+unpub/test/fixtures/package_0/1.0.1-beta.2/CHANGELOG.md
+  s_b24d3b345227bd::t_0160f54c1853ad 1
+unpub_aws/lib/s3/s3_file_store.dart
+  s_b24d3b345227bd::t_bd141842814be0 67-70
+  s_b24d3b345227bd::t_37d3079b5b1001 20-28,57-60
+DEPLOY.md
+  s_b24d3b345227bd::t_991621cc2ece4e 130-167,335-351,665
+  s_b24d3b345227bd::t_357f00e840d24f 275,277,371,403
+  s_76aff4e981bf45::t_678fb34aa30af4 276
+  s_b24d3b345227bd::t_f9fec7856c1310 272,290,369,372,375-376,383,389,397,516,523,542
+  s_76aff4e981bf45::t_aaa32eb78eace0 370
+unpub/pubspec.yaml
+  s_b24d3b345227bd::t_33cd500632741a 3
+unpub/lib/src/mongo_store.dart
+  s_b24d3b345227bd::t_57d79822e45916 88,90-92,132-134
+  s_b24d3b345227bd::t_37d3079b5b1001 16,28,38-39,62-71,89,93,161-163
+  s_b24d3b345227bd::t_3337288b863c01 75-87,94
+unpub/test/fixtures/package_0/1.0.1-beta.1/pubspec.yaml
+  s_b24d3b345227bd::t_938f80dbe68ec7 1-6
+LINUX_DEPLOY.md
+  s_b24d3b345227bd::t_f178da9c1db674 8-11,14-15,17
+  s_b24d3b345227bd::t_f9fec7856c1310 5-6,12-13,16,23,31,45,52
+  s_b24d3b345227bd::t_a3a880b678f2d7 36-44,46-51,53-78
+  s_76aff4e981bf45::t_b526ba2c735279 7
+unpub/CHANGELOG.md
+  s_b24d3b345227bd::t_33cd500632741a 1-6
+unpub/lib/src/file_store.dart
+  s_b24d3b345227bd::t_f03fd3f4ce1ee0 28-35
+Dockerfile
+  s_b24d3b345227bd::t_86900f2e66bbcc 27,49
+  s_b24d3b345227bd::t_ac988e16fd0e8c 29-42
+  s_dd119776eeb050::t_f92bfa0ec2276f 28
+unpub/lib/src/meta_store.dart
+  s_b24d3b345227bd::t_37d3079b5b1001 8
+  s_b24d3b345227bd::t_16cf74b90b6c9a 9
+unpub/test/utils.dart
+  s_b24d3b345227bd::t_0a61265afd9ca5 45-47,51-52,59-61,63-66
+  s_b24d3b345227bd::t_37d3079b5b1001 48-50,53-58,62,68-73,79-84
+docs/superpowers/specs/2026-06-16-prerelease-cleanup-design.md
+  s_b24d3b345227bd::t_56c862b1296fc2 74
+  s_b24d3b345227bd::t_1beec0e9b799a3 1-73,75-153
+unpub/test/fixtures/package_0/1.0.1-beta.2/pubspec.yaml
+  s_b24d3b345227bd::t_938f80dbe68ec7 1-6
+unpub/test/fixtures/package_0/1.0.1/README.md
+  s_b24d3b345227bd::t_0160f54c1853ad 1
+unpub/lib/src/app.g.dart
+  s_b24d3b345227bd::t_bb86fbdffb9f56 20-21
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.7",
+  "base_commit_sha": "45ab95a2104e52ca243444e4c11a7e27ba2792ea",
+  "prompts": {},
+  "sessions": {
+    "s_76aff4e981bf45": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "3de1b36f-8555-4cf3-a4bd-5f9a8d11d6d8",
+        "model": "deepseek-v4-pro"
+      },
+      "human_author": "weiye0205 <weiye0205@gmail.com>"
+    },
+    "s_b24d3b345227bd": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019ecf67-9f7b-7672-88ae-e3f73b10c44c",
+        "model": "gpt-5.5"
+      },
+      "human_author": null
+    },
+    "s_dd119776eeb050": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "aec1e718-4064-4ccd-848b-29f269785ff2",
+        "model": "deepseek-v4-pro"
+      },
+      "human_author": "weiye0205 <weiye0205@gmail.com>"
+    }
+  }
+}
