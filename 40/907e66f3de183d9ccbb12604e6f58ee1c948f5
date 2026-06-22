@@ -1,0 +1,27 @@
+unpub/lib/src/app.dart
+  s_9cc9d0e301626f::t_39aa9b9d331d7f 27-65,684,686,689
+  s_9cc9d0e301626f::t_393f74fbaec8f1 26
+unpub_web/web/index.html
+  s_9cc9d0e301626f::t_612a842d835c68 1701-1751
+unpub_web/lib/src/detail_component.dart
+  s_9cc9d0e301626f::t_a74e962b66685c 39,41,72-73,82-95,98-99
+  s_9cc9d0e301626f::t_393f74fbaec8f1 96-97
+unpub/lib/src/static/index.html.dart
+  s_9cc9d0e301626f::t_ba6c2391393020 1701-1751
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.9",
+  "base_commit_sha": "40907e66f3de183d9ccbb12604e6f58ee1c948f5",
+  "prompts": {},
+  "sessions": {
+    "s_9cc9d0e301626f": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019eee54-3c0e-7732-8a9f-08aad5c2b65f",
+        "model": "gpt-5.5"
+      },
+      "human_author": "weiye0205 <weiye0205@gmail.com>"
+    }
+  }
+}
