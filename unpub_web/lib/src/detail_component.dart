@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:html';
 import 'package:angular/angular.dart';
 import 'package:angular_router/angular_router.dart';
-import 'package:markdown/markdown.dart';
 import 'package:unpub_web/app_service.dart';
 import 'routes.dart';
 import 'package:unpub_api/models.dart';
@@ -37,11 +36,9 @@ class DetailComponent implements OnInit, OnActivate {
   int activeTab = 0;
   bool packageNotExists = false;
 
-  String get readmeHtml =>
-      package.readme == null ? null : markdownToHtml(package.readme);
+  String get readmeHtml => package.readme;
 
-  String get changelogHtml =>
-      package.changelog == null ? null : markdownToHtml(package.changelog);
+  String get changelogHtml => package.changelog;
 
   String get pubDevLink {
     var url = 'https://pub.dev/packages/$packageName';
@@ -72,12 +69,34 @@ class DetailComponent implements OnInit, OnActivate {
             .setInnerHtml(readmeHtml, validator: _htmlValidator);
         querySelector('#changelog')
             .setInnerHtml(changelogHtml, validator: _htmlValidator);
+        _bindInternalAnchors(querySelector('#readme'));
+        _bindInternalAnchors(querySelector('#changelog'));
       } on PackageNotExistsException {
         packageNotExists = true;
       } finally {
         appService.setLoading(false);
       }
     }
+  }
+
+  void _bindInternalAnchors(Element container) {
+    container.querySelectorAll('a[href^="#"]').forEach((anchor) {
+      anchor.onClick.listen((event) {
+        var href = anchor.attributes['href'];
+        if (href == null || href.length <= 1) return;
+
+        event.preventDefault();
+        event.stopPropagation();
+
+        var id = Uri.decodeComponent(href.substring(1));
+        var target = document.getElementById(id);
+        if (target == null) return;
+
+        target.scrollIntoView();
+        window.history
+            .replaceState(null, '', '${window.location.pathname}$href');
+      });
+    });
   }
 
   getListUrl(String q) {

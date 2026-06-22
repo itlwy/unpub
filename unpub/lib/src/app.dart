@@ -23,6 +23,46 @@ import 'static/main.dart.js.dart' as main_dart_js;
 
 part 'app.g.dart';
 
+final RegExp _headingIdDeniedCharacters = RegExp(r'[^\w\s\u4e00-\u9fff-]');
+final RegExp _headingIdWhitespace = RegExp(r'\s+');
+
+String _headingId(String text) => text
+    .toLowerCase()
+    .trim()
+    .replaceAll(_headingIdDeniedCharacters, '')
+    .replaceAll(_headingIdWhitespace, '-');
+
+class _HeaderWithIdSyntax extends HeaderSyntax {
+  const _HeaderWithIdSyntax();
+
+  @override
+  Node parse(BlockParser parser) {
+    var element = super.parse(parser) as Element;
+    element.generatedId = _headingId(element.textContent);
+    return element;
+  }
+}
+
+class _SetextHeaderWithIdSyntax extends SetextHeaderSyntax {
+  const _SetextHeaderWithIdSyntax();
+
+  @override
+  Node parse(BlockParser parser) {
+    var element = super.parse(parser) as Element;
+    element.generatedId = _headingId(element.textContent);
+    return element;
+  }
+}
+
+String _markdownToPackageHtml(String markdown) => markdownToHtml(
+      markdown,
+      blockSyntaxes: const [
+        _HeaderWithIdSyntax(),
+        _SetextHeaderWithIdSyntax(),
+      ],
+      extensionSet: ExtensionSet.gitHubFlavored,
+    );
+
 class App {
   static const proxyOriginHeader = "proxy-origin";
 
@@ -641,18 +681,12 @@ class App {
 
     var depMap = (pubspec['dependencies'] as Map? ?? {}).cast<String, String>();
 
-    // Render markdown to HTML with GFM extensions (tables, fenced code, etc.)
+    // Render markdown to HTML with GFM extensions and linkable headings.
     var readmeHtml = packageVersion.readme != null
-        ? markdownToHtml(
-            packageVersion.readme!,
-            extensionSet: ExtensionSet.gitHubFlavored,
-          )
+        ? _markdownToPackageHtml(packageVersion.readme!)
         : null;
     var changelogHtml = packageVersion.changelog != null
-        ? markdownToHtml(
-            packageVersion.changelog!,
-            extensionSet: ExtensionSet.gitHubFlavored,
-          )
+        ? _markdownToPackageHtml(packageVersion.changelog!)
         : null;
 
     var data = WebapiDetailView(

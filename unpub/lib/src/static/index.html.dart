@@ -1698,6 +1698,57 @@ const content = """<!DOCTYPE html>
       }
     </style>
     <link rel="icon" type="image/png" href="https://pub.dev/favicon.ico" />
+    <script>
+      (function () {
+        function closestMarkdownAnchor(element) {
+          while (element && element !== document) {
+            if (element.tagName === "A") {
+              var parent = element.parentElement;
+              while (parent && parent !== document) {
+                if (
+                  parent.classList &&
+                  parent.classList.contains("markdown-body")
+                ) {
+                  return element;
+                }
+                parent = parent.parentElement;
+              }
+            }
+            element = element.parentElement;
+          }
+          return null;
+        }
+
+        document.addEventListener(
+          "click",
+          function (event) {
+            var anchor = closestMarkdownAnchor(event.target);
+            if (!anchor) return;
+
+            var href = anchor.getAttribute("href");
+            if (!href || href.length <= 1 || href.charAt(0) !== "#") return;
+
+            var id = href.substring(1);
+            try {
+              id = decodeURIComponent(id);
+            } catch (_) {}
+
+            var target = document.getElementById(id);
+            if (!target) return;
+
+            event.preventDefault();
+            event.stopPropagation();
+            target.scrollIntoView();
+            history.replaceState(
+              null,
+              "",
+              location.pathname + location.search + href
+            );
+          },
+          true
+        );
+      })();
+    </script>
     <script defer src="main.dart.js"></script>
   </head>
   <body>
