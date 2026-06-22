@@ -269,7 +269,7 @@ uname -m
 
 ```bash
 cd unpub
-docker build -t unpub:2.0.1 .
+docker build -t unpub:2.0.2 .
 ```
 
 Dockerfile 会根据 Docker 目标平台自动选择 Dart SDK 架构：`linux/amd64` 使用 `dartsdk-linux-x64-release.zip`，`linux/arm64` 使用 `dartsdk-linux-arm64-release.zip`。如果需要显式指定，也可以加 `--build-arg DART_SDK_ARCH=x64` 或 `--build-arg DART_SDK_ARCH=arm64`。
@@ -287,7 +287,7 @@ docker run -d --name unpub \
   -p 4000:4000 \
   -v $(pwd)/data/datadb:/data/db \
   --restart always \
-  unpub:2.0.1
+  unpub:2.0.2
 
 # 查看日志确认启动成功
 docker logs unpub
@@ -366,27 +366,27 @@ colima start -f
 
 ```bash
 # 构建镜像（确认架构匹配远程机，参考 2.1 节）
-docker build -t unpub:2.0.1 .
+docker build -t unpub:2.0.2 .
 
 # 如需在 ARM64 Mac 上构建 x86_64 服务器镜像
-docker buildx build --platform linux/amd64 --load -t unpub:2.0.1-linux .
+docker buildx build --platform linux/amd64 --load -t unpub:2.0.2-linux .
 
 # 导出为压缩包
-docker save unpub:2.0.1 | gzip > unpub-2.0.1.tar.gz
-docker save unpub:2.0.1-linux | gzip > unpub-2.0.1-linux.tar.gz
+docker save unpub:2.0.2 | gzip > unpub-2.0.2.tar.gz
+docker save unpub:2.0.2-linux | gzip > unpub-2.0.2-linux.tar.gz
 ```
 
 ### 拷贝到远程机并启动
 
 ```bash
 # scp 拷贝
-scp unpub-2.0.1.tar.gz user@<打包机IP>:~/
+scp unpub-2.0.2.tar.gz user@<打包机IP>:~/
 
 # SSH 到远程机
 ssh user@<打包机IP>
 
 # 加载镜像
-docker load < unpub-2.0.1.tar.gz
+docker load < unpub-2.0.2.tar.gz
 
 # 启动（数据目录按需调整）
 mkdir -p ~/unpub-data
@@ -394,7 +394,7 @@ docker run -d --name unpub \
   -p 4000:4000 \
   -v ~/unpub-data/datadb:/data/db \
   --restart always \
-  unpub:2.0.1
+  unpub:2.0.2
 
 # 验证
 curl http://localhost:4000/healthz
@@ -513,14 +513,14 @@ docker logs unpub --tail 100  # 最近 100 行
 
 ```bash
 # 一键重建
-docker build -t unpub:2.0.1 . && \
+docker build -t unpub:2.0.2 . && \
 docker stop unpub && \
 docker rm unpub && \
 docker run -d --name unpub \
   -p 4000:4000 \
   -v $(pwd)/data/datadb:/data/db \
   --restart always \
-  unpub:2.0.1 && \
+  unpub:2.0.2 && \
 docker logs unpub | tail -10
 ```
 
@@ -539,7 +539,7 @@ docker run -d --name unpub \
   -p 4000:4000 \
   -v $(pwd)/data/datadb:/data/db \
   --restart always \
-  unpub:2.0.1
+  unpub:2.0.2
 ```
 
 ## 3.4 开机自启（Mac 打包机）

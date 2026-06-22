@@ -2,25 +2,25 @@
 
 ## 交付物
 
-- `unpub-2.0.1-linux.tar.gz` — Docker 镜像（x86_64）
-- 镜像标签：`unpub:2.0.1-linux`
+- `unpub-2.0.2-linux.tar.gz` — Docker 镜像（x86_64）
+- 镜像标签：`unpub:2.0.2-linux`
 
 ## 构建交付包
 
 ```bash
 # 在仓库根目录执行。ARM64 Mac 也可以产出 x86_64 Linux 镜像。
-docker buildx build --platform linux/amd64 --load -t unpub:2.0.1-linux .
-docker save unpub:2.0.1-linux | gzip > unpub-2.0.1-linux.tar.gz
+docker buildx build --platform linux/amd64 --load -t unpub:2.0.2-linux .
+docker save unpub:2.0.2-linux | gzip > unpub-2.0.2-linux.tar.gz
 
 # 验证镜像架构
-docker image inspect unpub:2.0.1-linux --format '{{.Architecture}}'
+docker image inspect unpub:2.0.2-linux --format '{{.Architecture}}'
 ```
 
 ## 部署
 
 ```bash
 # 1. 加载镜像
-docker load < unpub-2.0.1-linux.tar.gz
+docker load < unpub-2.0.2-linux.tar.gz
 
 # 2. 创建数据目录并启动
 mkdir -p /data/unpub
@@ -28,7 +28,7 @@ docker run -d --name unpub \
   -p 4000:4000 \
   -v /data/unpub/datadb:/data/db \
   --restart always \
-  unpub:2.0.1-linux
+  unpub:2.0.2-linux
 
 # 3. 验证
 curl http://localhost:4000/healthz   # 返回 "ok"
@@ -42,14 +42,14 @@ docker stop unpub || true
 docker rm unpub || true
 
 # 2. 加载新镜像
-docker load < unpub-2.0.1-linux.tar.gz
+docker load < unpub-2.0.2-linux.tar.gz
 
 # 3. 使用原数据目录启动
 docker run -d --name unpub \
   -p 4000:4000 \
   -v /data/unpub/datadb:/data/db \
   --restart always \
-  unpub:2.0.1-linux
+  unpub:2.0.2-linux
 
 # 4. 验证
 curl http://localhost:4000/healthz
